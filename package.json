@@ -1,0 +1,20 @@
+{
+  "name": "mindi_v1",
+  "version": "1.0.0",
+  "description": "Mini Depdency Injector JS",
+  "main": "./bundle/cjs/mindi_v1.js",
+  "scripts": {
+    "build": "node ./node_modules/rollup/bin/rollup -c",
+    "watch": "node ./node_modules/rollup/bin/rollup -c --watch"
+  },
+  "author": "Toby Nilsen",
+  "license": "MIT",
+  "dependencies": {
+    "coreutil_v1": "file:../coreutiljs"
+  },
+  "devDependencies": {
+    "rollup": "^0.57.1",
+    "rollup-plugin-multi-entry": "^2.0.2",
+    "rollup-plugin-postprocess": "^1.0.2"
+  }
+}
