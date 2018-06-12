@@ -28,7 +28,8 @@ export class Injector {
     }
 
     inject(object) {
-        this.injectFields(object,0)
+        this.injectFields(object,0);
+        return object;
     }
 
     instansiateAll(config) {
@@ -63,6 +64,9 @@ export class Injector {
 
     getInstanceByClassReference(classReference,structureDepth) {
         var instance = null;
+        if(Injector == classReference) {
+            return this;
+        }
         this._config.getConfigElements().forEach((configEntry,parent) => {
             if(configEntry.getClassReference() == classReference) {
                 if("PROTOTYPE" === configEntry.getInjectionType()){
