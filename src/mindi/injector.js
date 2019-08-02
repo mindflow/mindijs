@@ -1,11 +1,6 @@
-import {List} from "coreutil_v1";
-import { ConfigEntry } from "./configEntry.js";
 import { Config } from "./config.js";
 export class Injector {
 
-    /**
-     * @param {List}
-     */
     static getInstance() {
         if(injector === null) {
             injector = new Injector();
@@ -32,16 +27,20 @@ export class Injector {
         return object;
     }
 
+    /**
+     * 
+     * @param {Config} config 
+     */
     instansiateAll(config) {
-        config.getConfigElements().forEach((entry,parent) => {
-            entry.instansiate();
+        config.getConfigElements().forEach((key,value,parent) => {
+            value.instansiate();
             return true;
         },this);
     }
 
     performInjections(config) {
-        config.getConfigElements().forEach((configEntry,parent) => {
-            configEntry.getStoredInstances().forEach((instanceEntry,innerParent) => {
+        config.getConfigElements().forEach((key,value,parent) => {
+            value.getStoredInstances().forEach((instanceEntry,innerParent) => {
                 this.injectFields(instanceEntry,0);
                 return true;
             },parent);
@@ -67,16 +66,16 @@ export class Injector {
         if(Injector == classReference) {
             return this;
         }
-        this._config.getConfigElements().forEach((configEntry,parent) => {
-            if(configEntry.getClassReference() == classReference) {
-                if("PROTOTYPE" === configEntry.getInjectionType()){
+        this._config.getConfigElements().forEach((key,value,parent) => {
+            if(value.getClassReference() == classReference) {
+                if("PROTOTYPE" === value.getInjectionType()){
                     if(structureDepth < 3) {
                         return this.injectFields(new classReference(),structureDepth++);
                     }else{
                         throw "Structure of managed objects is too deep when trying to inject " + classReference.name;
                     }
                 }else{
-                    instance = configEntry.getInstance();
+                    instance = value.getInstance();
                 }
                 return false;
             }
