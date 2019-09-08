@@ -13,12 +13,12 @@ export class Injector {
      * @param {Config} config 
      */
     constructor() {
-        this._config = new Config();
+        this.config = new Config();
     }
 
     load(config) {
         this.instansiateAll(config);
-        this._config.addAll(config);
+        this.config.addAll(config);
         this.performInjections(config);
     }
 
@@ -66,7 +66,7 @@ export class Injector {
         if(Injector == classReference) {
             return this;
         }
-        this._config.getConfigElements().forEach((key,value,parent) => {
+        this.config.getConfigElements().forEach((key,value,parent) => {
             if(value.getClassReference() == classReference) {
                 if("PROTOTYPE" === value.getInjectionType()){
                     if(structureDepth < 3) {
