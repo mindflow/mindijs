@@ -15,13 +15,13 @@ export class ConfigEntry {
         this.storedInstances = new List();
         if("SINGLETON" === this.injectionType) {
             this.storedInstances.add(new this.classReference());
-        }else if("POOL" === this.injectionType) {
+        } else if ("POOL" === this.injectionType) {
             for(i = 0 ; i < this.poolSize ; i++) {
                 this.storedInstances.add(new this.classReference());
             }
-        }else if("PROTOTYPE" === this.injectionType) {
+        } else if ("PROTOTYPE" === this.injectionType) {
             // New instance every time
-        }else {
+        } else {
             throw "Unknown injectionType " + this.injectionType;
         }
     }

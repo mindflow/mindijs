@@ -1,23 +1,25 @@
-import {Map} from "coreutil_v1";
+import {Map, List} from "coreutil_v1";
 import {ConfigEntry} from "./configEntry.js"
 
 export class Config {
 
     constructor() {
-        this.configElements = new Map(); 
+        this.configElements = new Map();
+        this.postConfigs = new List();
     }
 
     addAll(config) {
         this.configElements.addAll(config.getConfigElements());
+        this.postConfigs.addAll(config.getPostConfigs());
     }
 
     addSingleton(className) {
-        this.configElements.set(className,new ConfigEntry(className,"SINGLETON"));
+        this.configElements.set(className.name,new ConfigEntry(className,"SINGLETON"));
         return this;
     }
 
     addPrototype(className) {
-        this.configElements.set(className,new ConfigEntry(className,"PROTOTYPE"));
+        this.configElements.set(className.name,new ConfigEntry(className,"PROTOTYPE"));
         return this;
     }
 
@@ -33,6 +35,14 @@ export class Config {
 
     getConfigElements() {
         return this.configElements;
+    }
+
+    getPostConfigs() {
+        return this.postConfigs;
+    }
+
+    addPostConfig(postConfig) {
+        this.postConfigs.add(postConfig);
     }
 
 }
