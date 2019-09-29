@@ -63,6 +63,7 @@ export class Injector {
                 LOG.error(e);
             }
         }).catch((fail) => {
+            LOG.error(fail);
             failFunction.call(object,fail);
         });
     }
