@@ -20,15 +20,29 @@ export class Injector {
      * @param {Config} config 
      */
     load(config) {
-        this.instansiateAll(config);
+        this.preloadConfigEntries(config);
         this.config.addAll(config);
         this.performInjections(config);
-        let promiseList = this.executePostConfig(config, this.config.getPostConfigs());
+        let promiseList = this.executeConfigProcessors(config, this.config.getConfigProcessors());
         this.postInjectPromises.addAll(promiseList);
+        Promise
+            .all(this.postInjectPromises.getArray())
+            .then((success) => {
+                LOG.info("Clearing")
+                this.postInjectPromises = new List();
+            });
     }
 
     inject(object) {
         this.injectFields(object, 0);
+        Promise
+            .all(this.postInjectPromises.getArray())
+            .then((success) => {
+                if(object.postConfig) {
+                    object.postConfig(this);
+                }
+            });
+
         return object;
     }
 
@@ -52,49 +66,47 @@ export class Injector {
         return this.getInstanceByClassReference(classNameString, 0, parameterArray);
     }
 
-    resolvePostConfigs(object, successFunction, failFunction) {
-        let currentPromises = this.postInjectPromises;
-        this.postInjectPromises = new List();
-        Promise.all(currentPromises.getArray())
-        .then((success) => {
-            try {
-                successFunction.call(object,success);
-            } catch(e) {
-                LOG.error(e);
-            }
-        }).catch((fail) => {
-            LOG.error(fail);
-            failFunction.call(object,fail);
-        });
-    }
-
     /**
      * 
      * @param {Config} config 
-     * @param {List} postConfigs
+     * @param {List} configProcessors
      * @returns {List}
      */
-    executePostConfig(config, postConfigs) {
+    executeConfigProcessors(config, configProcessors) {
         let promiseList = new List();
-        postConfigs.forEach((entry, parent) => {
-            let postInjectPromise = entry.postConfig(config);
-            if(postInjectPromise) {
-                promiseList.add(postInjectPromise);
+        configProcessors.forEach((entry, parent) => {
+            let configProcessorsPromise = entry.processConfig(config);
+            if(configProcessorsPromise) {
+                promiseList.add(configProcessorsPromise);
             }
             return true;
         }, this);
+        Promise
+            .all(promiseList.getArray())
+            .then((success) => {
+                this.executeAllPostConfig(config);
+            });
         return promiseList;
+    }
+
+    executeAllPostConfig(config) {
+        config.getConfigElements().forEach((key, value, parent) => {
+            if(value.getInstance() && (value.getInstance().postConfig)) {
+                value.getInstance().postConfig(this);
+            }
+            return true;
+        }, this);
     }
 
     /**
      * 
      * @param {Config} config 
      */
-    instansiateAll(config) {
+    preloadConfigEntries(config) {
         config.getConfigElements().forEach((key, value, parent) => {
-            value.instansiate();
-            if(value.getInstance() && (value.getInstance().postConfig)) {
-                config.addPostConfig(value.getInstance());
+            value.preload();
+            if(value.getInstance() && (value.getInstance().processConfig)) {
+                config.addConfigProcessor(value.getInstance());
             }
             return true;
         }, this);
@@ -115,6 +127,7 @@ export class Injector {
     }
 
     /**
+     * Swaps out classes for instances in the provided instanceEntry, limited by structureDepth
      * 
      * @param {object} instanceEntry 
      * @param {number} structureDepth 
@@ -132,10 +145,15 @@ export class Injector {
                 }
             }
         }
+        if(instanceEntry.postInject) {
+            instanceEntry.postInject(this);
+        }
         return instanceEntry;
     }
 
     /**
+     * Find configuration for class name, and instansiate or return instances based
+     * on whether they allready exist and wheter they are PROTOTYPEs or SINGLETONs
      * 
      * @param {class} classReference 
      * @param {number} structureDepth 
@@ -148,17 +166,13 @@ export class Injector {
         }
         this.config.getConfigElements().forEach((key, value, parent) => {
             if(key === classNameString) {
+                instance = value.getInstance(parameters);
                 if ("PROTOTYPE" === value.getInjectionType()){
                     if (structureDepth < 3) {
-                        let classReference = value.getClassReference();
-                        instance = this.injectFields(new classReference(...parameters), structureDepth++);
+                        this.injectFields(instance, structureDepth++);
                     } else {
                         throw "Structure of managed objects is too deep when trying to inject " + classNameString;
                     }
-                } else if ("SINGLETON" === value.getInjectionType()) {
-                    instance = value.getInstance();
-                } else {
-                    LOG.error("Injection type " + value.getInjectionType() + " not supported for " + classNameString);
                 }
                 return false;
             }

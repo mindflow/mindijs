@@ -5,12 +5,13 @@ export class Config {
 
     constructor() {
         this.configElements = new Map();
-        this.postConfigs = new List();
+        this.configProcessors = new List();
     }
 
     addAll(config) {
         this.configElements.addAll(config.getConfigElements());
-        this.postConfigs.addAll(config.getPostConfigs());
+        this.configProcessors.addAll(config.getConfigProcessors());
+        return this;
     }
 
     addSingleton(className) {
@@ -37,12 +38,12 @@ export class Config {
         return this.configElements;
     }
 
-    getPostConfigs() {
-        return this.postConfigs;
+    getConfigProcessors() {
+        return this.configProcessors;
     }
 
-    addPostConfig(postConfig) {
-        this.postConfigs.add(postConfig);
+    addConfigProcessor(configProcessor) {
+        this.configProcessors.add(configProcessor);
     }
 
 }

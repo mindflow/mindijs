@@ -10,7 +10,7 @@ export class ConfigEntry {
         this.instancePointer = 0;
     }
 
-    instansiate() {
+    preload() {
         this.instancePointer = 0;
         this.storedInstances = new List();
         if("SINGLETON" === this.injectionType) {
@@ -44,14 +44,14 @@ export class ConfigEntry {
         return this.storedInstances;
     }
 
-    getInstance() {
-        if(this.storedInstances === null) {
-            throw "Config entry has not been instansiated: " + this.classReference.name;
-        }
+    /**
+     * 
+     * @param {array} parameters the parameters to use for the class if it is configured as a prototype
+     */
+    getInstance(parameters = []) {
 
-        // Create a new instance each time for prototypes
         if("PROTOTYPE" === this.injectionType) {
-            return new this.classReference();
+            return new this.classReference(...parameters);
         }
 
         // Get the instance from the next position in the pool
