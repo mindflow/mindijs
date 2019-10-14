@@ -12,7 +12,7 @@ export class Injector {
 
     constructor() {
         this.config = new Config();
-        this.postInjectPromises = new List();
+        this.configProcessorPromises = new List();
     }
 
     /**
@@ -20,29 +20,32 @@ export class Injector {
      * @param {Config} config 
      */
     load(config) {
-        this.preloadConfigEntries(config);
+        this.finishedLoading = new Promise(
+            (resolve, reject) => { resolve(); }
+        );
+
+
+        let preloadedInstances = this.preloadConfigEntries(config);
+
         this.config.addAll(config);
+
         this.performInjections(config);
+
         let promiseList = this.executeConfigProcessors(config, this.config.getConfigProcessors());
-        this.postInjectPromises.addAll(promiseList);
+        this.configProcessorPromises.addAll(promiseList);
+
+        this.executeInstanceProcessors(preloadedInstances, true);
+
         Promise
-            .all(this.postInjectPromises.getArray())
+            .all(this.configProcessorPromises.getArray())
             .then((success) => {
-                LOG.info("Clearing")
-                this.postInjectPromises = new List();
+                this.configProcessorPromises = new List();
             });
     }
 
     inject(object) {
         this.injectFields(object, 0);
-        Promise
-            .all(this.postInjectPromises.getArray())
-            .then((success) => {
-                if(object.postConfig) {
-                    object.postConfig(this);
-                }
-            });
-
+        this.executeInstanceProcessors(new List([object]));
         return object;
     }
 
@@ -63,7 +66,9 @@ export class Injector {
             LOG.error("Config for class: " + classNameString + " is not a prototype");
             throw "Config for class: " + classNameString + " is not a prototype";
         }
-        return this.getInstanceByClassReference(classNameString, 0, parameterArray);
+        let instance = this.getInstanceByClassReference(classNameString, 0, parameterArray);
+        this.executeInstanceProcessors(new List([instance]));
+        return instance;
     }
 
     /**
@@ -81,21 +86,37 @@ export class Injector {
             }
             return true;
         }, this);
-        Promise
-            .all(promiseList.getArray())
-            .then((success) => {
-                this.executeAllPostConfig(config);
-            });
         return promiseList;
     }
 
-    executeAllPostConfig(config) {
-        config.getConfigElements().forEach((key, value, parent) => {
-            if(value.getInstance() && (value.getInstance().postConfig)) {
-                value.getInstance().postConfig(this);
-            }
-            return true;
-        }, this);
+    /**
+     * 
+     * @param {List} instanceList 
+     */
+    executeInstanceProcessors(instanceList, waitForConfigProcessors = false) {
+
+        let execute = () => {
+            this.config.getInstanceProcessors().forEach((processor,parent) => {
+                instanceList.forEach((instance,parent) => {
+                    processor.processInstance(instance);
+                    return true;
+                },this);
+                return true;
+            },this);
+        }
+
+        if(waitForConfigProcessors) {
+            this.finishedLoading = Promise.all(this.configProcessorPromises.getArray()).then((success) => { execute() });
+        } else {
+            execute();
+        }
+    }
+
+    /**
+     * @returns {Promise}
+     */
+    getFinishedLoadingPromise() {
+        return this.finishedLoading;
     }
 
     /**
@@ -103,13 +124,19 @@ export class Injector {
      * @param {Config} config 
      */
     preloadConfigEntries(config) {
+        let instances = new List();
         config.getConfigElements().forEach((key, value, parent) => {
             value.preload();
+            instances.addAll(value.getStoredInstances());
             if(value.getInstance() && (value.getInstance().processConfig)) {
                 config.addConfigProcessor(value.getInstance());
             }
+            if(value.getInstance() && (value.getInstance().processInstance)) {
+                config.addInstanceProcessor(value.getInstance());
+            }
             return true;
         }, this);
+        return instances;
     }
 
     /**
