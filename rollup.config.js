@@ -1,6 +1,6 @@
 import multiEntry from 'rollup-plugin-multi-entry';
 import postprocess from 'rollup-plugin-postprocess';
-import { uglify } from "rollup-plugin-uglify";
+import uglify from "rollup-plugin-uglify-es";
 
 export default [{
     input: "src/**/*.js",
@@ -15,7 +15,8 @@ export default [{
         multiEntry(),
         postprocess([
             [/(?<=import\s*(.*)\s*from\s*)['"]((?!.*[.]js).*)['"];/, '\'./$2.js\'']
-        ])
+        ]),
+        uglify()
     ]
 },{
     input: "src/**/*.js",
@@ -27,6 +28,7 @@ export default [{
         format: "cjs"
     },
     plugins: [
-        multiEntry()
+        multiEntry(),
+        uglify()
     ]
 }]
