@@ -2,3 +2,4 @@
 /bin/
 /target/
 /nbproject/private/
+package-lock.json
