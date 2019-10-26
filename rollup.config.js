@@ -6,7 +6,7 @@ export default [{
     external: [ 'coreutil_v1' ],
     output: {
         name: 'mindi_v1',
-        file: "bundle/jsm/mindi_v1.js",
+        file: "dist/jsm/mindi_v1.js",
         sourcemap: "inline",
         format: "es"
     },
@@ -21,7 +21,7 @@ export default [{
     external: [ 'coreutil_v1' ],
     output: {
         name: 'mindi_v1',
-        file: "bundle/cjs/mindi_v1.js",
+        file: "dist/cjs/mindi_v1.js",
         sourcemap: "inline",
         format: "cjs"
     },
