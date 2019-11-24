@@ -1,5 +1,5 @@
-import {Map, List} from "coreutil_v1";
-import {ConfigEntry} from "./configEntry.js"
+import { Map, List } from "coreutil_v1";
+import { ConfigEntry } from "./configEntry.js"
 
 export class Config {
 
@@ -16,23 +16,23 @@ export class Config {
         return this;
     }
 
-    addSingleton(className) {
-        this.configElements.set(className.name,new ConfigEntry(className,"SINGLETON"));
+    addSingleton(classReference) {
+        this.configElements.set(classReference.name, new ConfigEntry(classReference, "SINGLETON"));
         return this;
     }
 
-    addPrototype(className) {
-        this.configElements.set(className.name,new ConfigEntry(className,"PROTOTYPE"));
+    addPrototype(classReference) {
+        this.configElements.set(classReference.name, new ConfigEntry(classReference, "PROTOTYPE"));
         return this;
     }
 
-    addNamedSingleton(name,className) {
-        this.configElements.set(name,new ConfigEntry(className,"SINGLETON"));
+    addNamedSingleton(name, classReference) {
+        this.configElements.set(name, new ConfigEntry(classReference, "SINGLETON"));
         return this;
     }
 
-    addNamedPrototype(name,className) {
-        this.configElements.set(name,new ConfigEntry(className,"PROTOTYPE"));
+    addNamedPrototype(name, classReference) {
+        this.configElements.set(name, new ConfigEntry(classReference, "PROTOTYPE"));
         return this;
     }
 

@@ -6,13 +6,12 @@ export class ConfigEntry {
         this.classReference = classReference;
         this.injectionType = injectionType;
         this.poolSize = poolSize;
-        this.storedInstances = null;
+        this.storedInstances = new List();
         this.instancePointer = 0;
     }
 
     preload() {
         this.instancePointer = 0;
-        this.storedInstances = new List();
         if("SINGLETON" === this.injectionType) {
             this.storedInstances.add(new this.classReference());
         } else if ("POOL" === this.injectionType) {

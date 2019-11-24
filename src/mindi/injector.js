@@ -1,5 +1,5 @@
-import { Config } from "./config.js";
 import { List, Logger } from "coreutil_v1";
+import { Config } from "./config.js";
 import { ConfigEntry } from "./configEntry.js";
 
 const LOG = new Logger("Injector");
@@ -24,8 +24,7 @@ export class Injector {
             (resolve, reject) => { resolve(); }
         );
 
-
-        let preloadedInstances = this.preloadConfigEntries(config);
+        const preloadedInstances = this.preloadConfigEntries(config);
 
         this.config.addAll(config);
 
@@ -51,22 +50,22 @@ export class Injector {
 
     /**
      * 
-     * @param {class} className 
+     * @param {class} classReference 
      * @param {array} parameterArray 
      */
-    prototypeInstance(className, parameterArray) {
+    prototypeInstance(classReference, parameterArray) {
         /** @type {ConfigEntry} */
-        let classNameString = className.name;
-        let config = this.config.getConfigElements().get(classNameString);
+        const className = classReference.name;
+        const config = this.config.getConfigElements().get(className);
         if(!config) {
-            LOG.error("No config found for class: " + classNameString);
-            throw "No config found for class: " + classNameString;
+            LOG.error("No config found for class: " + className);
+            throw "No config found for class: " + className;
         }
-        if(! "PROTOTYPE" === config.getInjectionType()) {
-            LOG.error("Config for class: " + classNameString + " is not a prototype");
-            throw "Config for class: " + classNameString + " is not a prototype";
+        if ("PROTOTYPE" !== config.getInjectionType()) {
+            LOG.error("Config for class: " + className + " is not a prototype");
+            throw "Config for class: " + className + " is not a prototype";
         }
-        let instance = this.getInstanceByClassReference(classNameString, 0, parameterArray);
+        const instance = this.getInstanceByClassReference(className, 0, parameterArray);
         this.executeInstanceProcessors(new List([instance]));
         return instance;
     }
@@ -78,9 +77,9 @@ export class Injector {
      * @returns {List}
      */
     executeConfigProcessors(config, configProcessors) {
-        let promiseList = new List();
+        const promiseList = new List();
         configProcessors.forEach((entry, parent) => {
-            let configProcessorsPromise = entry.processConfig(config);
+            const configProcessorsPromise = entry.processConfig(config);
             if(configProcessorsPromise) {
                 promiseList.add(configProcessorsPromise);
             }
@@ -124,7 +123,7 @@ export class Injector {
      * @param {Config} config 
      */
     preloadConfigEntries(config) {
-        let instances = new List();
+        const instances = new List();
         config.getConfigElements().forEach((key, value, parent) => {
             value.preload();
             instances.addAll(value.getStoredInstances());
@@ -161,10 +160,10 @@ export class Injector {
      */
     injectFields(instanceEntry, structureDepth) {
         
-        for (var field in instanceEntry) {
+        for (const field in instanceEntry) {
             
             if (field !== undefined && field !== null && instanceEntry[field] != null && instanceEntry[field].prototype instanceof Object) {
-                var instance = this.getInstanceByClassReference(instanceEntry[field].name, structureDepth);
+                const instance = this.getInstanceByClassReference(instanceEntry[field].name, structureDepth);
                 if (instance !== undefined && instance !== null) {
                     instanceEntry[field] = instance;
                 } else if (instance === undefined) {
