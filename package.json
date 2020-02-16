@@ -1,8 +1,9 @@
 {
+  "type": "module",
   "name": "mindi_v1",
   "version": "1.0.0",
   "description": "Mini Depdency Injector JS",
-  "main": "./dist/cjs/mindi_v1.js",
+  "main": "./dist/jsm/mindi_v1.js",
   "scripts": {
     "build": "node ./node_modules/rollup/dist/bin/rollup -c",
     "watch": "node ./node_modules/rollup/dist/bin/rollup -c --watch"
@@ -13,9 +14,26 @@
     "coreutil_v1": "file:../coreutiljs"
   },
   "devDependencies": {
+    "jest": "^25.1.0",
     "rollup": "^1.25.2",
     "rollup-plugin-multi-entry": "^2.1.0",
     "rollup-plugin-postprocess": "^1.0.2",
     "rollup-plugin-uglify-es": "^0.0.1"
+  },
+  "jest": {
+    "verbose": true,
+    "globals": {
+      "NODE_ENV": "test"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "jsx"
+    ],
+    "moduleDirectories": [
+      "node_modules"
+    ],
+    "transformIgnorePatterns": [
+      "js"
+    ]
   }
 }
