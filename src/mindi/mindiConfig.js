@@ -64,6 +64,44 @@ export class MindiConfig extends Config {
     }
 
     /**
+     * 
+     * @param {List} typeConfigList
+     */
+    addAllTypeConfig(typeConfigList) {
+        typeConfigList.forEach((typeConfig,parent) => {
+            this.configEntries.set(typeConfig.getName(), typeConfig);
+            return true;
+        },this);
+        return this;
+    }
+
+    /**
+     * 
+     * @param {List} configProcessorList 
+     */
+    addAllConfigProcessor(configProcessorList) {
+        configProcessorList.forEach((configProcessor,parent) => {
+            this.configProcessors.add(configProcessor.name);
+            this.addTypeConfig(SingletonConfig.unnamed(configProcessor));
+            return true;
+        },this);
+        return this;
+    }
+
+    /**
+     * 
+     * @param {List} instanceProcessorList 
+     */
+    addAllInstanceProcessor(instanceProcessorList) {
+        instanceProcessorList.forEach((instanceProcessor,parent) => {
+            this.instanceProcessors.add(instanceProcessor.name);
+            this.addTypeConfig(SingletonConfig.unnamed(instanceProcessor));
+            return true;
+        },this);
+        return this;
+    }
+
+    /**
      * @returns {Map}
      */
     getConfigEntries() {
