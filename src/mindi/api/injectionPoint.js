@@ -11,7 +11,7 @@ export class InjectionPoint {
         return new InjectionPoint(classReference.name, classReference, InjectionPoint.INSTANCE_TYPE, parameters);
     }
 
-    static provideryByName(name, classReference, parameters = []) {
+    static providerByName(name, classReference, parameters = []) {
         return new InjectionPoint(name, classReference, InjectionPoint.PROVIDER_TYPE, parameters);
     }
 
