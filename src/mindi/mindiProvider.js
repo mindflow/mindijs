@@ -3,6 +3,7 @@ import { TypeConfig } from "./typeConfig/typeConfig.js";
 import { InstanceHolder } from "./typeConfig/instanceHolder.js";
 import { Injector } from "./injector.js";
 import { Config } from "./config.js";
+import { ConfigAccessor } from "./configAccessor.js";
 
 export class MindiProvider extends Provider {
 
@@ -11,6 +12,9 @@ export class MindiProvider extends Provider {
      * @param {TypeConfig} typeConfig 
      */
     constructor(typeConfig, injector, config) {
+
+        super();
+
         /** @type {TypeConfig} */
         this.typeConfig = typeConfig;
 
@@ -23,11 +27,11 @@ export class MindiProvider extends Provider {
 
     get(parameters = []) {
         /** @type {InstanceHolder} */
-        const instanceHolder = this.typeConfig.instanceHolder(parameters);
+        const instanceHolder = ConfigAccessor.instanceHolder(this.typeConfig.getName(), this.config, parameters);
         if (instanceHolder.getType() === InstanceHolder.NEW_INSTANCE) {
             this.injector.injectTarget(instanceHolder.getInstance(), this.config)
         }
-        return insatanceHolder.getInstance();
+        return instanceHolder.getInstance();
     }
 
 }

@@ -1,5 +1,3 @@
-import { Provider } from "../api/provider.js";
-
 export class TypeConfig {
 
     constructor(name, classReference) {
