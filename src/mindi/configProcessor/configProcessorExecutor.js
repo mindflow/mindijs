@@ -25,10 +25,10 @@ export class ConfigProcessorExecutor {
         configProcessorClassNameList.forEach((configProcessorClassName, parent) => {
             /**  @type {InstanceHolder} */
             const processorHolder = ConfigAccessor.instanceHolder(configProcessorClassName, config);
-            if(processorHolder.getType() === InstanceHolder.NEW_INSTANCE) {
-                injector.injectTarget(processorHolder.getInstance(), config);
+            if(processorHolder.type === InstanceHolder.NEW_INSTANCE) {
+                injector.injectTarget(processorHolder.instance, config);
             }
-            const processorsPromise = processorHolder.getInstance().processConfig(config);
+            const processorsPromise = processorHolder.instance.processConfig(config);
             if (processorsPromise) {
                 promiseList.add(processorsPromise);
             }

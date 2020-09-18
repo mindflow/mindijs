@@ -1,24 +1,17 @@
 export class Config {
- 
-        /**
-     * @returns {Map}
-     */
-    getConfigEntries() {
-        return null;
+
+    constructor() {
+        /** @type {Map} */
+        this.configEntries = null;
+
+        /** @type {List} */
+        this.configProcessors = null;
+
+        /** @type {List} */
+        this.instanceProcessors = null;
     }
 
-    /**
-     * @returns {List}
-     */
-    getConfigProcessors() {
-        return null;
+    isFinalized() {
+        return false;
     }
-
-    /**
-     * @returns {List}
-     */
-    getInstanceProcessors() {
-        return null;
-    }
-
 }

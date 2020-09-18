@@ -18,9 +18,9 @@ export class InstanceProcessorExecutor {
      * @param {Config} config
      */
     static execute(instance, config) {
-        config.getInstanceProcessors().forEach((processorName, parent) => {
+        config.instanceProcessors.forEach((processorName, parent) => {
             const processorHolder = ConfigAccessor.instanceHolder(processorName, config);
-            processorHolder.getInstance().process(instance);
+            processorHolder.instance.process(instance);
             return true;
         }, this);
     }

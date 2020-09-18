@@ -17,12 +17,4 @@ export class InstanceHolder {
         this.type = type;
     }
 
-    getInstance() {
-        return this.instance;
-    }
-
-    getType() {
-        return this.type;
-    }
-
 }

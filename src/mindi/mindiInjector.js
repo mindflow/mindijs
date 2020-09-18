@@ -36,7 +36,7 @@ export class MindiInjector extends Injector {
         if (!config) {
             throw Error("Missing config");
         }
-        if (!config.getFinalized()) {
+        if (!config.isFinalized()) {
             throw Error("Config not finalized");
         }
         if (depth > 10) {
@@ -59,7 +59,7 @@ export class MindiInjector extends Injector {
      */
     injectProperty(target, key, config, depth) {
         const injectionPoint = target[key];
-        if (injectionPoint.getType() === InjectionPoint.PROVIDER_TYPE) {
+        if (injectionPoint.type === InjectionPoint.PROVIDER_TYPE) {
             this.injectPropertyProvider(target, key, config, depth);
             return;
         }
@@ -77,7 +77,7 @@ export class MindiInjector extends Injector {
          * @type {InjectionPoint}
          */
         const injectionPoint = target[key];
-        const typeConfig = ConfigAccessor.typeConfigByName(injectionPoint.getName(), config);
+        const typeConfig = ConfigAccessor.typeConfigByName(injectionPoint.name, config);
         target[key] = new MindiProvider(typeConfig, this, config);
     }
 
@@ -92,11 +92,11 @@ export class MindiInjector extends Injector {
          * @type {InjectionPoint}
          */
         const injectionPoint = target[key];
-        const instanceHolder = ConfigAccessor.instanceHolder(injectionPoint.getName(), config, injectionPoint.getParameters());
-        if(instanceHolder.getType() === InstanceHolder.NEW_INSTANCE) {
-            this.injectTarget(instanceHolder.getInstance(), config, depth++);
+        const instanceHolder = ConfigAccessor.instanceHolder(injectionPoint.name, config, injectionPoint.parameters);
+        if(instanceHolder.type === InstanceHolder.NEW_INSTANCE) {
+            this.injectTarget(instanceHolder.instance, config, depth++);
         }
-        target[key] = instanceHolder.getInstance();
+        target[key] = instanceHolder.instance;
     }
 
 }

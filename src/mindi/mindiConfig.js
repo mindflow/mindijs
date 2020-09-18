@@ -12,6 +12,7 @@ export class MindiConfig extends Config {
     constructor() {
         super();
         this.finalized = false;
+        /** @type {Map} */
         this.configEntries = new Map();
         this.configProcessors = new List();
         this.instanceProcessors = new List();
@@ -22,21 +23,22 @@ export class MindiConfig extends Config {
      * @param {Config} config 
      */
     merge(config) {
-        if (!config.getFinalized()) {
+        if (!config.isFinalized()) {
             throw Error("Cannot merge into an unfinalized config");
         }
         const newConfigEntries = new Map();
         newConfigEntries.addAll(this.configEntries);
-        newConfigEntries.addAll(config.getConfigEntries());
+        newConfigEntries.addAll(config.configEntries);
 
         const newConfigProcessors = new List();
         newConfigProcessors.addAll(this.configProcessors);
-        newConfigProcessors.addAll(config.getConfigProcessors());
+        newConfigProcessors.addAll(config.configProcessors);
 
         const newInstanceProcessors = new List();
         newInstanceProcessors.addAll(this.instanceProcessors);
-        newInstanceProcessors.addAll(config.getInstanceProcessors());
+        newInstanceProcessors.addAll(config.instanceProcessors);
 
+        /** @type {Map} */
         this.configEntries = newConfigEntries;
         this.configProcessors = newConfigProcessors;
         this.instanceProcessors = newInstanceProcessors;
@@ -49,7 +51,7 @@ export class MindiConfig extends Config {
      * @param {TypeConfig} typeConfig 
      */
     addTypeConfig(typeConfig) {
-        this.configEntries.set(typeConfig.getName(), typeConfig);
+        this.configEntries.set(typeConfig.name, typeConfig);
         return this;
     }
 
@@ -69,7 +71,7 @@ export class MindiConfig extends Config {
      */
     addAllTypeConfig(typeConfigList) {
         typeConfigList.forEach((typeConfig,parent) => {
-            this.configEntries.set(typeConfig.getName(), typeConfig);
+            this.configEntries.set(typeConfig.name, typeConfig);
             return true;
         },this);
         return this;
@@ -101,34 +103,13 @@ export class MindiConfig extends Config {
         return this;
     }
 
-    /**
-     * @returns {Map}
-     */
-    getConfigEntries() {
-        return this.configEntries;
-    }
-
-    /**
-     * @returns {List}
-     */
-    getConfigProcessors() {
-        return this.configProcessors;
-    }
-
-    /**
-     * @returns {List}
-     */
-    getInstanceProcessors() {
-        return this.instanceProcessors;
-    }
-
-    getFinalized() {
+    isFinalized() {
         return this.finalized;
     }
 
     finalize() {
         this.finalized = true;
-        return ConfigProcessorExecutor.execute(this.getConfigProcessors(), MindiInjector.getInstance(), this);
+        return ConfigProcessorExecutor.execute(this.configProcessors, MindiInjector.getInstance(), this);
     }
 
 }

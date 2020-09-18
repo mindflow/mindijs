@@ -27,11 +27,11 @@ export class MindiProvider extends Provider {
 
     get(parameters = []) {
         /** @type {InstanceHolder} */
-        const instanceHolder = ConfigAccessor.instanceHolder(this.typeConfig.getName(), this.config, parameters);
-        if (instanceHolder.getType() === InstanceHolder.NEW_INSTANCE) {
-            this.injector.injectTarget(instanceHolder.getInstance(), this.config)
+        const instanceHolder = ConfigAccessor.instanceHolder(this.typeConfig.name, this.config, parameters);
+        if (instanceHolder.type === InstanceHolder.NEW_INSTANCE) {
+            this.injector.injectTarget(instanceHolder.instance, this.config)
         }
-        return instanceHolder.getInstance();
+        return instanceHolder.instance;
     }
 
 }

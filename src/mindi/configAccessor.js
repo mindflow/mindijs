@@ -41,7 +41,7 @@ export class ConfigAccessor {
      */
     static typeConfigByName(name, config) {
         let configEntry = null;
-        config.getConfigEntries().forEach((key, value, parent) => {
+        config.configEntries.forEach((key, value, parent) => {
             if(key === name) {
                 configEntry = value;
                 return false;

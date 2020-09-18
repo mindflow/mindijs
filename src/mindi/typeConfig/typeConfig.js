@@ -5,14 +5,6 @@ export class TypeConfig {
         this.classReference = classReference;
     }
 
-    getClassReference() {
-        return this.classReference;
-    }
-
-    getName() {
-        return this.name;
-    }
-
     instanceHolder(parameters = []) {
         return null;
     }

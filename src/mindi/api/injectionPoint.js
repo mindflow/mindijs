@@ -52,20 +52,4 @@ export class InjectionPoint {
         this.parameters = parameters;
     }
 
-    getName() {
-        return this.name;
-    }
-
-    getClassReference() {
-        return this.classReference;
-    }
-
-    getType() {
-       return this.type; 
-    }
-
-    getParameters() {
-        return this.parameters;
-    }
-
 }

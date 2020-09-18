@@ -10,13 +10,13 @@ export class ExampleConfigProcessor {
      * @param {Config} config
      */
     processConfig(config) {
-        config.getConfigEntries().forEach((key, value, parent) => {
+        config.configEntries.forEach((key, value, parent) => {
             /** @type {TypeConfig} */
             const typeConfig = value;
 
             LOG.info("Config processor for");
             LOG.info(typeConfig);
-            LOG.info(typeConfig.getClassReference());
+            LOG.info(typeConfig.classReference);
 
             return true;
         }, this);
