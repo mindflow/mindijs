@@ -14,7 +14,7 @@ export class InstanceProcessorExecutor {
 
     /**
      * @param {List} instanceProcessorList the instance processors
-     * @param {Obect} instance the instance to process
+     * @param {Object} instance the instance to process
      * @param {Config} config
      */
     static execute(instance, config) {

@@ -1,7 +1,9 @@
-import { Logger, List } from "coreutil_v1";
+import { Map, Logger, List } from "coreutil_v1";
 import { Config } from "../config.js";
 import { ConfigAccessor } from "../configAccessor.js";
+import { Injector } from "../injector.js";
 import { InstanceHolder } from "../typeConfig/instanceHolder.js";
+import { TypeConfig } from "../typeConfig/typeConfig.js";
 
 const LOG = new Logger("ConfigProcessorExecutor");
 
@@ -28,13 +30,35 @@ export class ConfigProcessorExecutor {
             if(processorHolder.type === InstanceHolder.NEW_INSTANCE) {
                 injector.injectTarget(processorHolder.instance, config);
             }
-            const processorsPromise = processorHolder.instance.processConfig(config);
+            const processorsPromise = processorHolder.instance.processConfig(config, 
+                ConfigProcessorExecutor.prepareUnconfiguredConfigEntries(config.configEntries));
             if (processorsPromise) {
                 promiseList.add(processorsPromise);
             }
             return true;
         }, this);
         return Promise.all(promiseList.getArray());
+    }
+
+    static prepareUnconfiguredConfigEntries(configEntries) {
+        const unconfiguredConfigEntries = new Map();
+
+        configEntries.forEach((key, value, parent) => {
+
+            /**
+             * @type {TypeConfig}
+             */
+            const configEntry = value;
+
+            if(configEntry.stage === TypeConfig.NEW) {
+                unconfiguredConfigEntries.set(key, configEntry);
+                configEntry.stage = TypeConfig.CONFIGURED;
+            }
+
+            return true;
+        }, this);
+
+        return unconfiguredConfigEntries;
     }
 
 }

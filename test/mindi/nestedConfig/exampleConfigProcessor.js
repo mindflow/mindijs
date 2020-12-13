@@ -8,9 +8,10 @@ export class ExampleConfigProcessor {
 
     /**
      * @param {Config} config
+     * @param {Map} configEntries
      */
-    processConfig(config) {
-        config.configEntries.forEach((key, value, parent) => {
+    processConfig(config, configEntries) {
+        configEntries.forEach((key, value, parent) => {
             /** @type {TypeConfig} */
             const typeConfig = value;
 

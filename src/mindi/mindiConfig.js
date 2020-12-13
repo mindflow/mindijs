@@ -23,9 +23,7 @@ export class MindiConfig extends Config {
      * @param {Config} config 
      */
     merge(config) {
-        if (!config.isFinalized()) {
-            throw Error("Cannot merge into an unfinalized config");
-        }
+        this.finalized = true;
         const newConfigEntries = new Map();
         newConfigEntries.addAll(this.configEntries);
         newConfigEntries.addAll(config.configEntries);
@@ -51,6 +49,7 @@ export class MindiConfig extends Config {
      * @param {TypeConfig} typeConfig 
      */
     addTypeConfig(typeConfig) {
+        this.finalized = false;
         this.configEntries.set(typeConfig.name, typeConfig);
         return this;
     }
@@ -70,6 +69,7 @@ export class MindiConfig extends Config {
      * @param {List} typeConfigList
      */
     addAllTypeConfig(typeConfigList) {
+        this.finalized = false;
         typeConfigList.forEach((typeConfig,parent) => {
             this.configEntries.set(typeConfig.name, typeConfig);
             return true;
