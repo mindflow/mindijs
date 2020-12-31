@@ -58,23 +58,24 @@ export class MindiInjector extends Injector {
     }
 
     /**
-     * @param {object} targetObject 
-     * @param {string} fieldName 
+     * @param {Object} targetObject 
+     * @param {String} fieldName 
      * @param {Config} config 
-     * @param {number} depth 
+     * @param {Number} depth 
      * @param {Injector} injector
      * @returns {Promise}
      */
     static injectProperty(targetObject, fieldName, config, depth, injector) {
         const injectionPoint = targetObject[fieldName];        
-        if(injectionPoint instanceof InjectionPoint) {
-            if (injectionPoint.type === InjectionPoint.PROVIDER_TYPE) {
-                MindiInjector.injectPropertyProvider(targetObject, fieldName, config, injector);
-                return new Promise((resolve, reject) => { resolve(); });
-            }
-            return MindiInjector.injectPropertyInstance(targetObject, fieldName, config, depth, injector);
+        if(!(injectionPoint instanceof InjectionPoint)) {
+            return Promise.resolve();
         }
-        return new Promise((resolve, reject) => { resolve(); })
+        if (injectionPoint.type === InjectionPoint.PROVIDER_TYPE) {
+            MindiInjector.injectPropertyProvider(targetObject, fieldName, config, injector);
+            return Promise.resolve();
+        }
+        return MindiInjector.injectPropertyInstance(targetObject, fieldName, config, depth, injector);
+        
     }
 
     /**
@@ -98,13 +99,14 @@ export class MindiInjector extends Injector {
      * @param {Config} config 
      * @param {number} depth 
      * @param {Injector} injector
+     * @returns {Promise}
      */
     static injectPropertyInstance(targetObject, fieldName, config, depth, injector) {
-        let injectPromise = new Promise((resolve, reject) => { resolve(); })
+        let injectPromise = Promise.resolve();
         /** @type {InjectionPoint} */
         const injectionPoint = targetObject[fieldName];
         const instanceHolder = ConfigAccessor.instanceHolder(injectionPoint.name, config, injectionPoint.parameters);
-        if(instanceHolder.type === InstanceHolder.NEW_INSTANCE) {
+        if (instanceHolder.type === InstanceHolder.NEW_INSTANCE) {
             injectPromise = injector.injectTarget(instanceHolder.instance, config, depth++);
         }
         targetObject[fieldName] = instanceHolder.instance;

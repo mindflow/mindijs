@@ -1,11 +1,12 @@
 import { Logger } from "coreutil_v1";
+import { InstanceProcessor } from "./instanceProcessor.js";
 
 const LOG = new Logger("InstancePostConfigTrigger");
 
 /**
  * Instance processor which calls postConfig on objects after configProcessors are finished
  */
-export class InstancePostConfigTrigger {
+export class InstancePostConfigTrigger extends InstanceProcessor {
 
     /**
      * 

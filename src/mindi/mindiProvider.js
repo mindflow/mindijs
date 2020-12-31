@@ -10,6 +10,8 @@ export class MindiProvider extends Provider {
     /**
      * 
      * @param {TypeConfig} typeConfig 
+     * @param {Injector} injector
+     * @param {Config} config
      */
     constructor(typeConfig, injector, config) {
 
@@ -36,7 +38,7 @@ export class MindiProvider extends Provider {
         if (instanceHolder.type === InstanceHolder.NEW_INSTANCE) {
             return this.injector.injectTarget(instanceHolder.instance, this.config);
         }
-        return new Promise((resolve, reject) => { resolve(instanceHolder.instance)});;
+        return Promise.resolve(instanceHolder.instance);
     }
 
 }

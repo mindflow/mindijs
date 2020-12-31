@@ -4,6 +4,8 @@ import { ConfigProcessorExecutor } from "./configProcessor/configProcessorExecut
 import { SingletonConfig } from "./typeConfig/singletonConfig.js";
 import { Config } from "./config.js";
 import { MindiInjector } from "./mindiInjector.js";
+import { InstanceProcessor } from "./instanceProcessor/instanceProcessor.js";
+import { ConfigProcessor } from "./configProcessor/configProcessor.js";
 
 const LOG = new Logger("Config");
 
@@ -20,7 +22,8 @@ export class MindiConfig extends Config {
 
     /**
      * 
-     * @param {Config} config 
+     * @param {Config} config
+     * @returns {MindiConfig}
      */
     merge(config) {
         this.finalized = true;
@@ -46,7 +49,8 @@ export class MindiConfig extends Config {
 
     /**
      * 
-     * @param {TypeConfig} typeConfig 
+     * @param {TypeConfig} typeConfig
+     * @returns {MindiConfig}
      */
     addTypeConfig(typeConfig) {
         this.finalized = false;
@@ -54,11 +58,21 @@ export class MindiConfig extends Config {
         return this;
     }
 
+    /**
+     * 
+     * @param {ConfigProcessor} configProcessor
+     * @returns {MindiConfig}
+     */
     addConfigProcessor(configProcessor) {
         this.configProcessors.add(configProcessor.name);
         return this.addTypeConfig(SingletonConfig.unnamed(configProcessor));
     }
 
+    /**
+     * 
+     * @param {InstanceProcessor} instanceProcessor
+     * @returns {MindiConfig}
+     */
     addInstanceProcessor(instanceProcessor) {
         this.instanceProcessors.add(instanceProcessor.name);
         return this.addTypeConfig(SingletonConfig.unnamed(instanceProcessor));
@@ -67,39 +81,42 @@ export class MindiConfig extends Config {
     /**
      * 
      * @param {List} typeConfigList
+     * @return {MindiConfig}
      */
     addAllTypeConfig(typeConfigList) {
         this.finalized = false;
         typeConfigList.forEach((typeConfig,parent) => {
             this.configEntries.set(typeConfig.name, typeConfig);
             return true;
-        },this);
+        }, this);
         return this;
     }
 
     /**
      * 
-     * @param {List} configProcessorList 
+     * @param {List} configProcessorList
+     * @return {MindiConfig}
      */
     addAllConfigProcessor(configProcessorList) {
         configProcessorList.forEach((configProcessor,parent) => {
             this.configProcessors.add(configProcessor.name);
             this.addTypeConfig(SingletonConfig.unnamed(configProcessor));
             return true;
-        },this);
+        }, this);
         return this;
     }
 
     /**
      * 
      * @param {List} instanceProcessorList 
+     * @return {MindiConfig}
      */
     addAllInstanceProcessor(instanceProcessorList) {
         instanceProcessorList.forEach((instanceProcessor,parent) => {
             this.instanceProcessors.add(instanceProcessor.name);
             this.addTypeConfig(SingletonConfig.unnamed(instanceProcessor));
             return true;
-        },this);
+        }, this);
         return this;
     }
 

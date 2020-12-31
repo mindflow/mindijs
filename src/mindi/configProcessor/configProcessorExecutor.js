@@ -26,7 +26,7 @@ export class ConfigProcessorExecutor {
         return configProcessorClassNameList.promiseChain((configProcessorClassName, parent) => {
             return new Promise((resolveConfigProcessorExecuted, reject) => {
 
-                let targetInjectedPromise = new Promise((resolveTargetInjected, reject) => {resolveTargetInjected()})
+                let targetInjectedPromise = Promise.resolve();
 
                 /**  @type {InstanceHolder} */
                 const processorHolder = ConfigAccessor.instanceHolder(configProcessorClassName, config);
@@ -44,14 +44,17 @@ export class ConfigProcessorExecutor {
         })
     }
 
+    /**
+     * 
+     * @param {Map} configEntries 
+     * @return {Map}
+     */
     static prepareUnconfiguredConfigEntries(configEntries) {
         const unconfiguredConfigEntries = new Map();
 
         configEntries.forEach((key, value, parent) => {
 
-            /**
-             * @type {TypeConfig}
-             */
+            /** @type {TypeConfig} */
             const configEntry = value;
 
             if(configEntry.stage === TypeConfig.NEW) {
