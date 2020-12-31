@@ -11,6 +11,16 @@ export class Config {
         this.instanceProcessors = null;
     }
 
+    /**
+     * @returns {Promise}
+     */
+    finalize() {
+
+    }
+
+    /**
+     * @returns {Boolean}
+     */
     isFinalized() {
         return false;
     }

@@ -17,27 +17,31 @@ const LOG = new Logger("ConfigProcessorExecutor");
 export class ConfigProcessorExecutor {
     
     /**
-     * @param {List} configProcessorClassList
+     * @param {List} configProcessorClassNameList
      * @param {Injector} injector
      * @param {Config} config
      * @returns {Promise} promise which is resolved when all config processors are resolved
      */
     static execute(configProcessorClassNameList, injector, config) {
-        const promiseList = new List();
-        configProcessorClassNameList.forEach((configProcessorClassName, parent) => {
-            /**  @type {InstanceHolder} */
-            const processorHolder = ConfigAccessor.instanceHolder(configProcessorClassName, config);
-            if(processorHolder.type === InstanceHolder.NEW_INSTANCE) {
-                injector.injectTarget(processorHolder.instance, config);
-            }
-            const processorsPromise = processorHolder.instance.processConfig(config, 
-                ConfigProcessorExecutor.prepareUnconfiguredConfigEntries(config.configEntries));
-            if (processorsPromise) {
-                promiseList.add(processorsPromise);
-            }
-            return true;
-        }, this);
-        return Promise.all(promiseList.getArray());
+        return configProcessorClassNameList.promiseChain((configProcessorClassName, parent) => {
+            return new Promise((resolveConfigProcessorExecuted, reject) => {
+
+                let targetInjectedPromise = new Promise((resolveTargetInjected, reject) => {resolveTargetInjected()})
+
+                /**  @type {InstanceHolder} */
+                const processorHolder = ConfigAccessor.instanceHolder(configProcessorClassName, config);
+                if(processorHolder.type === InstanceHolder.NEW_INSTANCE) {
+                    targetInjectedPromise = injector.injectTarget(processorHolder.instance, config);
+                }
+
+                targetInjectedPromise.then(() => {
+                    const toConfigureMap = ConfigProcessorExecutor.prepareUnconfiguredConfigEntries(config.configEntries);
+                    processorHolder.instance.processConfig(config, toConfigureMap).then(() => {
+                        resolveConfigProcessorExecuted();
+                    });
+                });
+            });
+        })
     }
 
     static prepareUnconfiguredConfigEntries(configEntries) {

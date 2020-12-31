@@ -103,10 +103,16 @@ export class MindiConfig extends Config {
         return this;
     }
 
+    /**
+     * @returns {Boolean}
+     */
     isFinalized() {
         return this.finalized;
     }
 
+    /**
+     * @returns {Promise}
+     */
     finalize() {
         this.finalized = true;
         return ConfigProcessorExecutor.execute(this.configProcessors, MindiInjector.getInstance(), this);

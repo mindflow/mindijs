@@ -4,6 +4,11 @@ const LOG = new Logger("Provider");
 
 export class Provider {
 
+    /**
+     * 
+     * @param {Array} parameters 
+     * @returns {Promise}
+     */
     get(parameters = []) {
         return null;
     }

@@ -6,7 +6,7 @@ const LOG = new Logger("InstanceProcessorExecutor");
 
 /**
  * Executes the configs instance processors on the provided instance
- * Returns a promise for when the config processors has completed running
+ * Returns a promise for when the instance processors has completed running
  * 
  * Instance processors perform operations on managed instances after they have been instansiated
  */
@@ -16,12 +16,12 @@ export class InstanceProcessorExecutor {
      * @param {List} instanceProcessorList the instance processors
      * @param {Object} instance the instance to process
      * @param {Config} config
+     * @returns {Promise}
      */
     static execute(instance, config) {
-        config.instanceProcessors.forEach((processorName, parent) => {
+        return config.instanceProcessors.promiseChain((processorName, parent) => {
             const processorHolder = ConfigAccessor.instanceHolder(processorName, config);
-            processorHolder.instance.process(instance);
-            return true;
+            return processorHolder.instance.process(instance);
         }, this);
     }
 

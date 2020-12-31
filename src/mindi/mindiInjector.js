@@ -1,4 +1,4 @@
-import { Logger } from "coreutil_v1";
+import { List, Logger } from "coreutil_v1";
 import { Config } from "./config.js";
 import { ConfigAccessor } from "./configAccessor.js";
 import { InjectionPoint } from "./api/injectionPoint.js"
@@ -12,7 +12,7 @@ const LOG = new Logger("MindiInjector");
 export class MindiInjector extends Injector {
 
     static inject(target, config) {
-        INJECTOR.injectTarget(target, config);
+        return INJECTOR.injectTarget(target, config);
     }
 
     /**
@@ -25,12 +25,13 @@ export class MindiInjector extends Injector {
     /**
      * Helper method for injecting fields in target object
      * 
-     * @param {any} target 
+     * @param {any} targetObject 
      * @param {Config} config 
      * @param {number} depth
+     * @returns {Promise}
      */
-    injectTarget(target, config, depth = 0) {
-        if (!target) {
+    injectTarget(targetObject, config, depth = 0) {
+        if (!targetObject) {
             throw Error("Missing target object");
         }
         if (!config) {
@@ -43,60 +44,71 @@ export class MindiInjector extends Injector {
             throw Error("Injection structure too deep");
         }
         const injector = this;
-        Object.keys(target).forEach(function(key,index) {
-            if (target[key] instanceof InjectionPoint) {
-                injector.injectProperty(target, key, config, depth);
+        const objectFieldNames = new List(Object.keys(targetObject));
+        return new Promise((resolve, reject) => {
+            return objectFieldNames.promiseChain((fieldName, parent) => {
+                return MindiInjector.injectProperty(targetObject, fieldName, config, depth, injector);
+            }).then(() => {
+                InstanceProcessorExecutor.execute(targetObject, config).then(() =>{
+                    resolve(targetObject);
+                });
+            });
+        })
+
+    }
+
+    /**
+     * @param {object} targetObject 
+     * @param {string} fieldName 
+     * @param {Config} config 
+     * @param {number} depth 
+     * @param {Injector} injector
+     * @returns {Promise}
+     */
+    static injectProperty(targetObject, fieldName, config, depth, injector) {
+        const injectionPoint = targetObject[fieldName];        
+        if(injectionPoint instanceof InjectionPoint) {
+            if (injectionPoint.type === InjectionPoint.PROVIDER_TYPE) {
+                MindiInjector.injectPropertyProvider(targetObject, fieldName, config, injector);
+                return new Promise((resolve, reject) => { resolve(); });
             }
-        });
-        InstanceProcessorExecutor.execute(target, config);
-    }
-
-    /**
-     * @param {object} target 
-     * @param {string} key 
-     * @param {Config} config 
-     * @param {number} depth 
-     */
-    injectProperty(target, key, config, depth) {
-        const injectionPoint = target[key];
-        if (injectionPoint.type === InjectionPoint.PROVIDER_TYPE) {
-            this.injectPropertyProvider(target, key, config, depth);
-            return;
+            return MindiInjector.injectPropertyInstance(targetObject, fieldName, config, depth, injector);
         }
-        this.injectPropertyInstance(target, key, config);
+        return new Promise((resolve, reject) => { resolve(); })
     }
 
     /**
-     * @param {object} target 
-     * @param {string} key 
+     * @param {object} targetObject 
+     * @param {string} fieldName 
      * @param {Config} config 
-     * @param {number} depth 
+     * @param {Injector} injector
      */
-    injectPropertyProvider(target, key, config) {
+    static injectPropertyProvider(targetObject, fieldName, config, injector) {
         /**
          * @type {InjectionPoint}
          */
-        const injectionPoint = target[key];
+        const injectionPoint = targetObject[fieldName];
         const typeConfig = ConfigAccessor.typeConfigByName(injectionPoint.name, config);
-        target[key] = new MindiProvider(typeConfig, this, config);
+        targetObject[fieldName] = new MindiProvider(typeConfig, injector, config);
     }
 
     /**
-     * @param {object} target 
-     * @param {string} key 
+     * @param {object} targetObject 
+     * @param {string} fieldName 
      * @param {Config} config 
      * @param {number} depth 
+     * @param {Injector} injector
      */
-    injectPropertyInstance(target, key, config, depth) {
-        /**
-         * @type {InjectionPoint}
-         */
-        const injectionPoint = target[key];
+    static injectPropertyInstance(targetObject, fieldName, config, depth, injector) {
+        let injectPromise = new Promise((resolve, reject) => { resolve(); })
+        /** @type {InjectionPoint} */
+        const injectionPoint = targetObject[fieldName];
         const instanceHolder = ConfigAccessor.instanceHolder(injectionPoint.name, config, injectionPoint.parameters);
         if(instanceHolder.type === InstanceHolder.NEW_INSTANCE) {
-            this.injectTarget(instanceHolder.instance, config, depth++);
+            injectPromise = injector.injectTarget(instanceHolder.instance, config, depth++);
         }
-        target[key] = instanceHolder.instance;
+        targetObject[fieldName] = instanceHolder.instance;
+        return injectPromise;
     }
 
 }

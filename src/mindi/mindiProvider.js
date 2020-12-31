@@ -25,13 +25,18 @@ export class MindiProvider extends Provider {
         this.config = config;
     }
 
+    /**
+     * 
+     * @param {Array} parameters 
+     * @returns {Promise}
+     */
     get(parameters = []) {
         /** @type {InstanceHolder} */
         const instanceHolder = ConfigAccessor.instanceHolder(this.typeConfig.name, this.config, parameters);
         if (instanceHolder.type === InstanceHolder.NEW_INSTANCE) {
-            this.injector.injectTarget(instanceHolder.instance, this.config)
+            return this.injector.injectTarget(instanceHolder.instance, this.config);
         }
-        return instanceHolder.instance;
+        return new Promise((resolve, reject) => { resolve(instanceHolder.instance)});;
     }
 
 }
