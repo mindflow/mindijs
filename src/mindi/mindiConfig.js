@@ -13,10 +13,17 @@ export class MindiConfig extends Config {
 
     constructor() {
         super();
+
+        /** @type {Boolean} */
         this.finalized = false;
-        /** @type {Map} */
+
+        /** @type {Map<TypeConfig>} */
         this.configEntries = new Map();
+
+        /** @type {List<String>} */
         this.configProcessors = new List();
+
+        /** @type {List<String>} */
         this.instanceProcessors = new List();
     }
 
@@ -27,6 +34,8 @@ export class MindiConfig extends Config {
      */
     merge(config) {
         this.finalized = true;
+
+
         const newConfigEntries = new Map();
         newConfigEntries.addAll(this.configEntries);
         newConfigEntries.addAll(config.configEntries);
@@ -80,7 +89,7 @@ export class MindiConfig extends Config {
 
     /**
      * 
-     * @param {List} typeConfigList
+     * @param {List<TypeConfig>} typeConfigList
      * @return {MindiConfig}
      */
     addAllTypeConfig(typeConfigList) {
@@ -94,7 +103,7 @@ export class MindiConfig extends Config {
 
     /**
      * 
-     * @param {List} configProcessorList
+     * @param {List<new() => ConfigProcessor>} configProcessorList
      * @return {MindiConfig}
      */
     addAllConfigProcessor(configProcessorList) {
@@ -108,7 +117,7 @@ export class MindiConfig extends Config {
 
     /**
      * 
-     * @param {List} instanceProcessorList 
+     * @param {List<new() => InstanceProcessor} instanceProcessorList 
      * @return {MindiConfig}
      */
     addAllInstanceProcessor(instanceProcessorList) {

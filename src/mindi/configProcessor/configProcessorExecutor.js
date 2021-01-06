@@ -17,7 +17,7 @@ const LOG = new Logger("ConfigProcessorExecutor");
 export class ConfigProcessorExecutor {
     
     /**
-     * @param {List} configProcessorClassNameList
+     * @param {List<String>} configProcessorClassNameList
      * @param {Injector} injector
      * @param {Config} config
      * @returns {Promise} promise which is resolved when all config processors are resolved
@@ -46,10 +46,11 @@ export class ConfigProcessorExecutor {
 
     /**
      * 
-     * @param {Map} configEntries 
-     * @return {Map}
+     * @param {Map<TypeConfig>} configEntries 
+     * @return {Map<TypeConfig>}
      */
     static prepareUnconfiguredConfigEntries(configEntries) {
+        /** @type {Map<TypeConfig>} */
         const unconfiguredConfigEntries = new Map();
 
         configEntries.forEach((key, value, parent) => {

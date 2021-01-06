@@ -3,19 +3,18 @@ import { Logger } from "coreutil_v1";
 import { InstanceHolder } from "./typeConfig/instanceHolder.js";
 import { TypeConfig } from "./typeConfig/typeConfig.js";
 
+const LOG = new Logger("ConfigAccessor");
+
 /**
  * Utilities for accessing a Config object
  */
-
-const LOG = new Logger("ConfigAccessor");
-
 export class ConfigAccessor {
 
     /**
      * Get an instance by class name in the config
      * 
-     * @param {Config} config 
      * @param {string} name 
+     * @param {Config} config 
      * @param {Array} parameters
      * @returns {InstanceHolder}
      */
