@@ -6,40 +6,40 @@ export class InjectionPoint {
     static get PROVIDER_TYPE() { return 1; } 
 
     /**
-     * 
+     * @template T
      * @param {string} name 
-     * @param {function} classReference 
+     * @param {new() => T} classReference 
      * @param {array} parameters 
-     * @returns {object}
+     * @returns {T}
      */
     static instanceByName(name, classReference, parameters = []) {
         return new InjectionPoint(name, classReference, InjectionPoint.INSTANCE_TYPE, parameters);
     }
 
     /**
-     * 
-     * @param {function} classReference 
+     * @template T
+     * @param {new() => T} classReference 
      * @param {array} parameters 
-     * @returns {object}
+     * @returns {T}
      */
     static instance(classReference, parameters = []) {
         return new InjectionPoint(classReference.name, classReference, InjectionPoint.INSTANCE_TYPE, parameters);
     }
 
     /**
-     * 
+     * @template T
      * @param {string} name 
-     * @param {function} classReference 
-     * @returns {Provider}
+     * @param {new() => T} classReference 
+     * @returns {Provider<T>}
      */
     static providerByName(name, classReference) {
         return new InjectionPoint(name, classReference, InjectionPoint.PROVIDER_TYPE);
     }
 
     /**
-     * 
-     * @param {function} classReference 
-     * @returns {Provider}
+     * @template T
+     * @param {new() => T} classReference 
+     * @returns {Provider<T>}
      */
     static provider(classReference) {
         return new InjectionPoint(classReference.name, classReference, InjectionPoint.PROVIDER_TYPE);
