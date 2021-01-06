@@ -5,6 +5,9 @@ import { Injector } from "./injector.js";
 import { Config } from "./config.js";
 import { ConfigAccessor } from "./configAccessor.js";
 
+/**
+ * @template T
+ */
 export class MindiProvider extends Provider {
 
     /**
@@ -30,7 +33,7 @@ export class MindiProvider extends Provider {
     /**
      * 
      * @param {Array} parameters 
-     * @returns {Promise}
+     * @returns {Promise<T>}
      */
     get(parameters = []) {
         /** @type {InstanceHolder} */
