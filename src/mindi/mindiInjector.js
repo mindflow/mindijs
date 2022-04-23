@@ -30,7 +30,7 @@ export class MindiInjector extends Injector {
      * @param {number} depth
      * @returns {Promise}
      */
-    injectTarget(targetObject, config, depth = 0) {
+    async injectTarget(targetObject, config, depth = 0) {
         if (!targetObject) {
             throw Error("Missing target object");
         }
@@ -45,15 +45,12 @@ export class MindiInjector extends Injector {
         }
         const injector = this;
         const objectFieldNames = new List(Object.keys(targetObject));
-        return new Promise((resolve, reject) => {
-            return objectFieldNames.promiseChain((fieldName, parent) => {
+
+        await objectFieldNames.promiseChain((fieldName, parent) => {
                 return MindiInjector.injectProperty(targetObject, fieldName, config, depth, injector);
-            }).then(() => {
-                InstanceProcessorExecutor.execute(targetObject, config).then(() =>{
-                    resolve(targetObject);
-                });
-            });
-        })
+        });
+        await InstanceProcessorExecutor.execute(targetObject, config);
+        return targetObject;
 
     }
 
