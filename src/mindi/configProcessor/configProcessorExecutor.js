@@ -28,8 +28,17 @@ export class ConfigProcessorExecutor {
 
                 let targetInjectedPromise = Promise.resolve();
 
+                /**  @type {TypeConfig} */
+                const typeConfig = ConfigAccessor.typeConfigByName(configProcessorClassName, config);
+
+                if (!typeConfig) {
+                    LOG.error(`No type config found for ${configProcessorClassName}`);
+                    return;
+                }
+
                 /**  @type {InstanceHolder} */
-                const processorHolder = ConfigAccessor.instanceHolder(configProcessorClassName, config);
+                const processorHolder = typeConfig.instanceHolder();
+
                 if(processorHolder.type === InstanceHolder.NEW_INSTANCE) {
                     targetInjectedPromise = injector.injectTarget(processorHolder.instance, config);
                 }

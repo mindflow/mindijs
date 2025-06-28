@@ -1,3 +1,5 @@
+import { InstanceHolder } from "./instanceHolder.js";
+
 export class TypeConfig {
 
     static get NEW() { return "NEW"; }
@@ -9,6 +11,11 @@ export class TypeConfig {
         this.stage = TypeConfig.NEW;
     }
 
+    /**
+     * 
+     * @param {array} parameters 
+     * @returns {InstanceHolder}
+     */
     instanceHolder(parameters = []) {
         return null;
     }

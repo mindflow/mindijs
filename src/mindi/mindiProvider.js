@@ -3,7 +3,6 @@ import { TypeConfig } from "./typeConfig/typeConfig.js";
 import { InstanceHolder } from "./typeConfig/instanceHolder.js";
 import { Injector } from "./injector.js";
 import { Config } from "./config.js";
-import { ConfigAccessor } from "./configAccessor.js";
 
 /**
  * @template T
@@ -36,8 +35,10 @@ export class MindiProvider extends Provider {
      * @returns {Promise<T>}
      */
     get(parameters = []) {
+
         /** @type {InstanceHolder} */
-        const instanceHolder = ConfigAccessor.instanceHolder(this.typeConfig.name, this.config, parameters);
+        const instanceHolder = this.typeConfig.instanceHolder(parameters);
+
         if (instanceHolder.type === InstanceHolder.NEW_INSTANCE) {
             return this.injector.injectTarget(instanceHolder.instance, this.config);
         }

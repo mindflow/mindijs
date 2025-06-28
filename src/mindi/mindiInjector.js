@@ -6,6 +6,7 @@ import { InstanceProcessorExecutor } from "./instanceProcessor/instanceProcessor
 import { InstanceHolder } from "./typeConfig/instanceHolder.js";
 import { MindiProvider } from "./mindiProvider.js";
 import { Injector } from "./injector.js";
+import { TypeConfig } from "./typeConfig/typeConfig.js";
 
 const LOG = new Logger("MindiInjector");
 
@@ -86,7 +87,14 @@ export class MindiInjector extends Injector {
          * @type {InjectionPoint}
          */
         const injectionPoint = targetObject[fieldName];
-        const typeConfig = ConfigAccessor.typeConfigByName(injectionPoint.name, config);
+
+        /** @type {TypeConfig} */
+        const typeConfig = MindiInjector.getTypeConfig(injectionPoint.name, injectionPoint.classReference, config);
+
+        if (!typeConfig) {
+            return;
+        }
+
         targetObject[fieldName] = new MindiProvider(typeConfig, injector, config);
     }
 
@@ -102,12 +110,39 @@ export class MindiInjector extends Injector {
         let injectPromise = Promise.resolve();
         /** @type {InjectionPoint} */
         const injectionPoint = targetObject[fieldName];
-        const instanceHolder = ConfigAccessor.instanceHolder(injectionPoint.name, config, injectionPoint.parameters);
+
+        /** @type {TypeConfig} */
+        const typeConfig = MindiInjector.getTypeConfig(injectionPoint.name, injectionPoint.classReference, config);
+
+
+        if (!typeConfig) {
+            return;
+        }
+
+        /** @type {InstanceHolder} */
+        const instanceHolder = typeConfig.instanceHolder(injectionPoint.parameters);
+
         if (instanceHolder.type === InstanceHolder.NEW_INSTANCE) {
             injectPromise = injector.injectTarget(instanceHolder.instance, config, depth++);
         }
         targetObject[fieldName] = instanceHolder.instance;
         return injectPromise;
+    }
+
+    /**
+     * 
+     * @param {string} name 
+     * @param {object} type 
+     * @param {Config} config 
+     * @returns {TypeConfig}
+     */
+    static getTypeConfig(name, classReference, config) {
+        const typeConfig = ConfigAccessor.typeConfigByName(name, config);
+        if (typeConfig) {
+            return typeConfig;
+        }
+        LOG.error(`No type config found for ${name} and classReference does not extend AutoConfig`);
+        return null;
     }
 
 }
