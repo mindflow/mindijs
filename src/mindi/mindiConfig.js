@@ -1,4 +1,4 @@
-import { Map, List, Logger } from "coreutil_v1";
+import { ArrayUtils, Logger, MapUtils } from "coreutil_v1";
 import { TypeConfig } from "./typeConfig/typeConfig.js";
 import { ConfigProcessorExecutor } from "./configProcessor/configProcessorExecutor.js";
 import { SingletonConfig } from "./typeConfig/singletonConfig.js";
@@ -20,11 +20,11 @@ export class MindiConfig extends Config {
         /** @type {Map<TypeConfig>} */
         this.configEntries = new Map();
 
-        /** @type {List<String>} */
-        this.configProcessors = new List();
+        /** @type {Array} */
+        this.configProcessors = new Array();
 
-        /** @type {List<String>} */
-        this.instanceProcessors = new List();
+        /** @type {Array} */
+        this.instanceProcessors = new Array();
     }
 
     /**
@@ -35,23 +35,12 @@ export class MindiConfig extends Config {
     merge(config) {
         this.finalized = true;
 
-
-        const newConfigEntries = new Map();
-        newConfigEntries.addAll(this.configEntries);
-        newConfigEntries.addAll(config.configEntries);
-
-        const newConfigProcessors = new List();
-        newConfigProcessors.addAll(this.configProcessors);
-        newConfigProcessors.addAll(config.configProcessors);
-
-        const newInstanceProcessors = new List();
-        newInstanceProcessors.addAll(this.instanceProcessors);
-        newInstanceProcessors.addAll(config.instanceProcessors);
-
-        /** @type {Map} */
-        this.configEntries = newConfigEntries;
-        this.configProcessors = newConfigProcessors;
-        this.instanceProcessors = newInstanceProcessors;
+        this.configEntries = MapUtils
+            .merge(this.configEntries, config.configEntries);
+        this.configProcessors = ArrayUtils
+            .merge(this.configProcessors, config.configProcessors);
+        this.instanceProcessors = ArrayUtils
+            .merge(this.instanceProcessors, config.instanceProcessors);
 
         return this;
     }
@@ -73,7 +62,7 @@ export class MindiConfig extends Config {
      * @returns {MindiConfig}
      */
     addConfigProcessor(configProcessor) {
-        this.configProcessors.add(configProcessor.name);
+        this.configProcessors = ArrayUtils.add(this.configProcessors, configProcessor.name);
         return this.addTypeConfig(SingletonConfig.unnamed(configProcessor));
     }
 
@@ -83,49 +72,46 @@ export class MindiConfig extends Config {
      * @returns {MindiConfig}
      */
     addInstanceProcessor(instanceProcessor) {
-        this.instanceProcessors.add(instanceProcessor.name);
+        this.instanceProcessors = ArrayUtils.add(this.instanceProcessors, instanceProcessor.name);
         return this.addTypeConfig(SingletonConfig.unnamed(instanceProcessor));
     }
 
     /**
      * 
-     * @param {List<TypeConfig>} typeConfigList
+     * @param {Array<TypeConfig>} typeConfigArray
      * @return {MindiConfig}
      */
-    addAllTypeConfig(typeConfigList) {
+    addAllTypeConfig(typeConfigArray) {
         this.finalized = false;
-        typeConfigList.forEach((typeConfig,parent) => {
+        typeConfigArray.forEach((typeConfig) => {
             this.configEntries.set(typeConfig.name, typeConfig);
-            return true;
-        }, this);
+        });
         return this;
     }
 
     /**
      * 
-     * @param {List<new() => ConfigProcessor>} configProcessorList
+     * @param {Array<new() => ConfigProcessor>} configProcessorArray
      * @return {MindiConfig}
      */
-    addAllConfigProcessor(configProcessorList) {
-        configProcessorList.forEach((configProcessor,parent) => {
-            this.configProcessors.add(configProcessor.name);
+    addAllConfigProcessor(configProcessorArray) {
+        configProcessorArray.forEach((configProcessor) => {
+            this.configProcessors = ArrayUtils.add(this.configProcessors, configProcessor.name);
             this.addTypeConfig(SingletonConfig.unnamed(configProcessor));
-            return true;
-        }, this);
+        });
         return this;
     }
 
     /**
      * 
-     * @param {List<new() => InstanceProcessor} instanceProcessorList 
+     * @param {Array<new() => InstanceProcessor>} instanceProcessorArray 
      * @return {MindiConfig}
      */
-    addAllInstanceProcessor(instanceProcessorList) {
-        instanceProcessorList.forEach((instanceProcessor,parent) => {
-            this.instanceProcessors.add(instanceProcessor.name);
+    addAllInstanceProcessor(instanceProcessorArray) {
+        instanceProcessorArray.forEach((instanceProcessor) => {
+            this.instanceProcessors = ArrayUtils.add(this.instanceProcessors, instanceProcessor.name);
             this.addTypeConfig(SingletonConfig.unnamed(instanceProcessor));
-            return true;
-        }, this);
+        });
         return this;
     }
 

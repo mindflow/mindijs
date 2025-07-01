@@ -1,13 +1,13 @@
 export class Config {
 
     constructor() {
-        /** @type {Map} */
+        /** @type {Map<any,any>} */
         this.configEntries = null;
 
-        /** @type {List} */
+        /** @type {Array<any>} */
         this.configProcessors = null;
 
-        /** @type {List} */
+        /** @type {Array<any>} */
         this.instanceProcessors = null;
     }
 

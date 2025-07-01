@@ -9,6 +9,10 @@ export class TypeConfigPack {
         this.typeConfigPackMap = new Map();
     }
 
+    /**
+     * 
+     * @returns {TypeConfigPack}
+     */
     static instance() {
         if (!TypeConfigPack._instance) {
             TypeConfigPack._instance = new TypeConfigPack();
@@ -32,8 +36,8 @@ export class TypeConfigPack {
 
     /**
      * 
-     * @param {*} packName 
-     * @returns 
+     * @param {string} packName 
+     * @returns {Array<TypeConfig>}
      */
     getConfigArrayByPackName(packName) { 
         if (this.typeConfigPackMap.has(packName)) {

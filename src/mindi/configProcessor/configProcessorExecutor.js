@@ -1,4 +1,4 @@
-import { Map, Logger, List } from "coreutil_v1";
+import { Logger, List } from "coreutil_v1";
 import { Config } from "../config.js";
 import { ConfigAccessor } from "../configAccessor.js";
 import { Injector } from "../injector.js";
@@ -17,12 +17,13 @@ const LOG = new Logger("ConfigProcessorExecutor");
 export class ConfigProcessorExecutor {
     
     /**
-     * @param {List<String>} configProcessorClassNameList
+     * @param {Array<String>} configProcessorClassNameArray
      * @param {Injector} injector
      * @param {Config} config
      * @returns {Promise} promise which is resolved when all config processors are resolved
      */
-    static execute(configProcessorClassNameList, injector, config) {
+    static execute(configProcessorClassNameArray, injector, config) {
+        const configProcessorClassNameList = new List(configProcessorClassNameArray);
         return configProcessorClassNameList.promiseChain((configProcessorClassName, parent) => {
             return new Promise((resolveConfigProcessorExecuted, reject) => {
 
@@ -55,14 +56,14 @@ export class ConfigProcessorExecutor {
 
     /**
      * 
-     * @param {Map<TypeConfig>} configEntries 
-     * @return {Map<TypeConfig>}
+     * @param {Map<string, TypeConfig>} configEntries 
+     * @return {Map<string, TypeConfig>}
      */
     static prepareUnconfiguredConfigEntries(configEntries) {
         /** @type {Map<TypeConfig>} */
         const unconfiguredConfigEntries = new Map();
 
-        configEntries.forEach((key, value, parent) => {
+        configEntries.forEach((value, key) => {
 
             /** @type {TypeConfig} */
             const configEntry = value;
@@ -71,9 +72,7 @@ export class ConfigProcessorExecutor {
                 unconfiguredConfigEntries.set(key, configEntry);
                 configEntry.stage = TypeConfig.CONFIGURED;
             }
-
-            return true;
-        }, this);
+        });
 
         return unconfiguredConfigEntries;
     }

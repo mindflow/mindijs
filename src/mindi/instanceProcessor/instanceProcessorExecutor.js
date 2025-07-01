@@ -15,13 +15,13 @@ const LOG = new Logger("InstanceProcessorExecutor");
 export class InstanceProcessorExecutor {
 
     /**
-     * @param {List} instanceProcessorList the instance processors
      * @param {Object} instance the instance to process
      * @param {Config} config
      * @returns {Promise}
      */
     static execute(instance, config) {
-        return config.instanceProcessors.promiseChain((processorName, parent) => {
+        const instanceProcessorList = new List(config.instanceProcessors);
+        return instanceProcessorList.promiseChain((processorName, parent) => {
             /** @type {TypeConfig} */
             const typeConfig = ConfigAccessor.typeConfigByName(processorName, config);
 
