@@ -1,4 +1,4 @@
-import { List, Logger } from "coreutil_v1";
+import { ArrayUtils, Logger } from "coreutil_v1";
 import { Config } from "./config.js";
 import { ConfigAccessor } from "./configAccessor.js";
 import { InjectionPoint } from "./api/injectionPoint.js"
@@ -45,9 +45,8 @@ export class MindiInjector extends Injector {
             throw Error("Injection structure too deep");
         }
         const injector = this;
-        const objectFieldNames = new List(Object.keys(targetObject));
 
-        await objectFieldNames.promiseChain((fieldName, parent) => {
+        await ArrayUtils.promiseChain(Object.keys(targetObject), (fieldName) => {
                 return MindiInjector.injectProperty(targetObject, fieldName, config, depth, injector);
         });
         await InstanceProcessorExecutor.execute(targetObject, config);

@@ -1,4 +1,4 @@
-import { Logger, List } from "coreutil_v1";
+import { Logger, ArrayUtils } from "coreutil_v1";
 import { ConfigAccessor } from "../configAccessor.js";
 import { Config } from "../config.js";
 import { TypeConfig } from "../typeConfig/typeConfig.js";
@@ -20,8 +20,7 @@ export class InstanceProcessorExecutor {
      * @returns {Promise}
      */
     static execute(instance, config) {
-        const instanceProcessorList = new List(config.instanceProcessors);
-        return instanceProcessorList.promiseChain((processorName, parent) => {
+        return ArrayUtils.promiseChain(config.instanceProcessors, (processorName) => {
             /** @type {TypeConfig} */
             const typeConfig = ConfigAccessor.typeConfigByName(processorName, config);
 
@@ -29,7 +28,7 @@ export class InstanceProcessorExecutor {
             const processorHolder = typeConfig.instanceHolder();
 
             return processorHolder.instance.process(instance);
-        }, this);
+        });
     }
 
 }

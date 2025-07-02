@@ -1,4 +1,4 @@
-import { Logger, List } from "coreutil_v1";
+import { Logger, ArrayUtils } from "coreutil_v1";
 import { Config } from "../config.js";
 import { ConfigAccessor } from "../configAccessor.js";
 import { Injector } from "../injector.js";
@@ -23,8 +23,7 @@ export class ConfigProcessorExecutor {
      * @returns {Promise} promise which is resolved when all config processors are resolved
      */
     static execute(configProcessorClassNameArray, injector, config) {
-        const configProcessorClassNameList = new List(configProcessorClassNameArray);
-        return configProcessorClassNameList.promiseChain((configProcessorClassName, parent) => {
+        return ArrayUtils.promiseChain(configProcessorClassNameArray, (configProcessorClassName) => {
             return new Promise((resolveConfigProcessorExecuted, reject) => {
 
                 let targetInjectedPromise = Promise.resolve();
