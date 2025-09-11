@@ -94,7 +94,7 @@ export class MindiInjector extends Injector {
             return;
         }
 
-        targetObject[fieldName] = new MindiProvider(typeConfig, injector, config);
+        targetObject[fieldName] = new MindiProvider(typeConfig, injector, config, injectionPoint.parameters);
     }
 
     /**

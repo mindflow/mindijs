@@ -14,8 +14,9 @@ export class MindiProvider extends Provider {
      * @param {TypeConfig} typeConfig 
      * @param {Injector} injector
      * @param {Config} config
+     * @param {Array} parameters
      */
-    constructor(typeConfig, injector, config) {
+    constructor(typeConfig, injector, config, parameters = []) {
 
         super();
 
@@ -27,6 +28,9 @@ export class MindiProvider extends Provider {
 
         /** @type {Config} */
         this.config = config;
+
+        /** @type {Array} */
+        this.parameters = parameters;
     }
 
     /**
@@ -36,8 +40,10 @@ export class MindiProvider extends Provider {
      */
     get(parameters = []) {
 
+        const instanceParameters = (parameters.length > 0) ? parameters : this.parameters;
+
         /** @type {InstanceHolder} */
-        const instanceHolder = this.typeConfig.instanceHolder(parameters);
+        const instanceHolder = this.typeConfig.instanceHolder(instanceParameters);
 
         if (instanceHolder.type === InstanceHolder.NEW_INSTANCE) {
             return this.injector.injectTarget(instanceHolder.instance, this.config);

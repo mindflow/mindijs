@@ -30,10 +30,11 @@ export class InjectionPoint {
      * @template T
      * @param {string} name 
      * @param {new() => T} classReference 
+     * @param {array} parameters 
      * @returns {Provider<T>}
      */
-    static providerByName(name, classReference) {
-        return new InjectionPoint(name, classReference, InjectionPoint.PROVIDER_TYPE);
+    static providerByName(name, classReference, parameters = []) {
+        return new InjectionPoint(name, classReference, InjectionPoint.PROVIDER_TYPE, parameters);
     }
 
     /**
@@ -41,8 +42,8 @@ export class InjectionPoint {
      * @param {new() => T} classReference 
      * @returns {Provider<T>}
      */
-    static provider(classReference) {
-        return new InjectionPoint(classReference.name, classReference, InjectionPoint.PROVIDER_TYPE);
+    static provider(classReference, parameters = []) {
+        return new InjectionPoint(classReference.name, classReference, InjectionPoint.PROVIDER_TYPE, parameters);
     }
 
     constructor(name, classReference, type = InjectionPoint.INSTANCE_TYPE, parameters = null) {
