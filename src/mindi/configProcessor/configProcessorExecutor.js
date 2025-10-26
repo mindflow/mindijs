@@ -59,7 +59,7 @@ export class ConfigProcessorExecutor {
      * @return {Map<string, TypeConfig>}
      */
     static prepareUnconfiguredConfigEntries(configEntries) {
-        /** @type {Map<TypeConfig>} */
+        /** @type {Map<String,TypeConfig>} */
         const unconfiguredConfigEntries = new Map();
 
         configEntries.forEach((value, key) => {
